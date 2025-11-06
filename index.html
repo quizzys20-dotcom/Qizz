@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Philippine History Quiz</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0066cc, #00cc99);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #fff;
+    color: #333;
+    width: 90%;
+    max-width: 600px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  h1 {
+    text-align: center;
+    color: #0066cc;
+    margin-bottom: 1.5rem;
+  }
+  .question {
+    font-weight: 600;
+    margin-bottom: .75rem;
+  }
+  .option {
+    display: block;
+    background: #f2f2f2;
+    padding: .6rem;
+    margin: .4rem 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .option:hover {
+    background: #d9e8ff;
+  }
+  .option.correct {
+    background: #c8f7c5;
+    border: 1px solid #3bb143;
+  }
+  .option.wrong {
+    background: #ffc6c6;
+    border: 1px solid #e63946;
+  }
+  #next-btn, #restart-btn {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: .7rem 1.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: block;
+    margin-left: auto;
+  }
+  #next-btn:hover, #restart-btn:hover {
+    background: #004c99;
+  }
+  #result {
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Philippine History Quiz</h1>
+  <div id="quiz-box">
+    <p id="question" class="question"></p>
+    <div id="options"></div>
+    <button id="next-btn">Next</button>
+  </div>
+  <div id="result" style="display:none;">
+    <h2>Your Score: <span id="score"></span>/10</h2>
+    <div id="answers"></div>
+    <button id="restart-btn">Try Again</button>
+  </div>
+</div>
+
+<script>
+  const quizData = [
+    {
+      question: "When did the Philippines declare independence from Spain?",
+      options: ["June 12, 1898", "July 4, 1946", "December 10, 1898", "August 21, 1983"],
+      correct: 0
+    },
+    {
+      question: "Who was known as the Father of the Katipunan?",
+      options: ["José Rizal", "Emilio Aguinaldo", "Andrés Bonifacio", "Apolinario Mabini"],
+      correct: 2
+    },
+    {
+      question: "Who wrote 'Noli Me Tangere'?",
+      options: ["Juan Luna", "José Rizal", "Marcelo H. del Pilar", "Antonio Luna"],
+      correct: 1
+    },
+    {
+      question: "Where was the Philippine Declaration of Independence proclaimed?",
+      options: ["Kawit, Cavite", "Malolos, Bulacan", "Intramuros, Manila", "Caloocan City"],
+      correct: 0
+    },
+    {
+      question: "When was the First Philippine Republic established?",
+      options: ["1898", "1899", "1901", "1946"],
+      correct: 1
+    },
+    {
+      question: "Who was the first President of the Philippines?",
+      options: ["Emilio Aguinaldo", "Manuel L. Quezon", "José P. Laurel", "Ferdinand Marcos"],
+      correct: 0
+    },
+    {
+      question: "What event marked the end of Spanish rule in the Philippines?",
+      options: ["Treaty of Paris", "Battle of Manila Bay", "Cry of Pugad Lawin", "People Power Revolution"],
+      correct: 0
+    },
+    {
+      question: "Who led the EDSA People Power Revolution in 1986?",
+      options: ["Corazon Aquino", "Ferdinand Marcos", "José Rizal", "Andrés Bonifacio"],
+      correct: 0
+    },
+    {
+      question: "What was the name of the secret revolutionary society against Spain?",
+      options: ["La Solidaridad", "Propaganda Movement", "Katipunan", "Malolos Congress"],
+      correct: 2
+    },
+    {
+      question: "When did the United States officially recognize Philippine independence?",
+      options: ["June 12, 1898", "July 4, 1946", "August 30, 1896", "December 10, 1898"],
+      correct: 1
+    }
+  ];
+
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const nextBtn = document.getElementById('next-btn');
+  const resultEl = document.getElementById('result');
+  const scoreEl = document.getElementById('score');
+  const answersEl = document.getElementById('answers');
+  const restartBtn = document.getElementById('restart-btn');
+  const quizBox = document.getElementById('quiz-box');
+
+  let current = 0;
+  let score = 0;
+  let userAnswers = [];
+
+  function showQuestion() {
+    const q = quizData[current];
+    questionEl.textContent = `${current + 1}. ${q.question}`;
+    optionsEl.innerHTML = "";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("div");
+      btn.textContent = opt;
+      btn.classList.add("option");
+      btn.onclick = () => selectAnswer(i);
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(i) {
+    const q = quizData[current];
+    const options = optionsEl.querySelectorAll(".option");
+    options.forEach((opt, idx) => {
+      opt.style.pointerEvents = "none"; // disable further clicks
+      if (idx === q.correct) opt.classList.add("correct");
+      else if (idx === i) opt.classList.add("wrong");
+    });
+    userAnswers.push(i);
+    if (i === q.correct) score++;
+  }
+
+  nextBtn.onclick = () => {
+    if (userAnswers.length === current + 1) {
+      current++;
+      if (current < quizData.length) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    } else {
+      alert("Please select an answer first.");
+    }
+  };
+
+  function showResults() {
+    quizBox.style.display = "none";
+    resultEl.style.display = "block";
+    scoreEl.textContent = score;
+    answersEl.innerHTML = "<h3>Correct Answers:</h3>";
+    quizData.forEach((q, i) => {
+      const p = document.createElement("p");
+      const userAnswer = userAnswers[i];
+      const correctText = q.options[q.correct];
+      p.innerHTML = `<b>${i+1}. ${q.question}</b><br>
+                     Your answer: <span style="color:${userAnswer===q.correct?'green':'red'}">
+                     ${q.options[userAnswer] || 'No answer'}</span><br>
+                     Correct answer: <b style="color:green">${correctText}</b>`;
+      answersEl.appendChild(p);
+    });
+  }
+
+  restartBtn.onclick = () => {
+    current = 0;
+    score = 0;
+    userAnswers = [];
+    quizBox.style.display = "block";
+    resultEl.style.display = "none";
+    showQuestion();
+  };
+
+  showQuestion();
+</script>
+
+</body>
+</html>
